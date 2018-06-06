@@ -7,5 +7,5 @@
 
 int main(int argc, char** argv)
 {
-   start_game();
+   exec_game_loop();
 }
