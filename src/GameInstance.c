@@ -36,13 +36,9 @@ void shuffle_shoe()
 
 void deal(player *p)
 {
-    p->hand[0] = SHOE[TOP_OF_SHOE++];
-    p->hand[1] = SHOE[TOP_OF_SHOE++]; 
-}
-
-unsigned int calc_hand(short *hand)
-{
-    return 0;
+    p->hand[p->amt_of_cards] = SHOE[TOP_OF_SHOE++];
+    p->hand[p->amt_of_cards + 1] = SHOE[TOP_OF_SHOE++];
+    p->amt_of_cards += 2;
 }
 
 void get_move()
@@ -50,23 +46,41 @@ void get_move()
 
 }
 
-void hit()
+unsigned int calc_hand(short *hand)
+{
+    return 0;
+}
+
+void hit(player *p)
 {
 
 }
 
-void d_down()
+void d_down(player *p)
+{
+
+}
+
+void stand(player *p)
+{
+
+}
+
+void split(player *p)
 {
 
 }
 
 void setup_new_game(player *p, unsigned int init_funds, player *d)
 {
+    // clean up players
+    p->amt_of_cards = 0;
+    d->amt_of_cards = 0;
     char* prompt = "Welcome to BJGym. You will be starting this round with %i credits."; 
     printf(prompt, init_funds);
     // generate shoe
     for (unsigned short i = 0; i < SHOE_SIZE; ++i) {
-        SHOE[i] = i%13;
+        SHOE[i] = (unsigned short)(i%13);
     }
 
     shuffle_shoe();
@@ -97,8 +111,23 @@ void dump(player *p, player *d)
 {
     puts("==========GAME STATE==========");
     printf("Player %x:\n", (unsigned int)p);
-    printf("\tHand: %i\t%i\n", p->hand[0], p->hand[1]);
+    printf("\tHand:\t");
+    for(unsigned short i = 0; i < p->amt_of_cards; i++){
+        printf("%i\t", p->hand[i]);
+    }
+    printf("\n");
     printf("\tBalance: %d\n", p->money);
+    puts("---");
+
+    printf("Dealer: %x:\n", (unsigned int)d);
+    printf("\tHand:\t");
+    for(unsigned short i = 0; i < d->amt_of_cards; i++){
+        printf("%i\t", d->hand[i]);
+    }
+    printf("\n");
+    puts("---");
+
+
 }
 
 void exec_game_loop()

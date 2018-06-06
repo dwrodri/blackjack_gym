@@ -9,7 +9,7 @@
 
 #endif //BLACKJACK_GYM_GAMEINSTANCE_H
 
-#define HAND_SIZE 8
+#define MAX_HAND_SIZE 8
 #define SHOE_SIZE 312
 #define MAX_BETS 4
 
@@ -17,15 +17,15 @@
 
 typedef struct
 {
-    short hand[HAND_SIZE]; // the amount of cards in hand
+    unsigned short hand[MAX_HAND_SIZE]; // place where cards are stored
+    unsigned short amt_of_cards;// amt of cards
     unsigned int money; // amount of money in wallet
 }player;
 
 typedef struct
 {
-    player* bet_source; //
-    unsigned int qty;
-
+    player* bet_source; //mem address of player who made bet
+    unsigned int qty; // amount that was bet
 }bet;
 
 // GLOBAL VARIABLES
@@ -43,10 +43,10 @@ void shuffle_shoe(); // shuffle the shoe
 void deal(player *p); //
 unsigned int calc_hand(short *hand); // get score of hand
 void get_move(); // read user input to perform move
-void hit(); // get new card
-void d_down(); // double down
-void stand(); // stop handing out cards to this player
-void split(); // split hand
+void hit(player *p); // get new card
+void d_down(player *p); // double down
+void stand(player *p); // stop handing out cards to this player
+void split(player *p); // split hand
 void setup_new_game(player *p, unsigned int init_funds, player *d); // routine for new game
 bool is_over(); // check for bust
 void dump(player *p, player *d); // print current game state

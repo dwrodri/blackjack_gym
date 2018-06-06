@@ -1,5 +1,6 @@
 .idea/
 .vscode/
+bin/*
 cmake-build-debug/
 *.o
 a.out
