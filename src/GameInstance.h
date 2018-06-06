@@ -12,13 +12,14 @@
 #define HAND_SIZE 10
 #define SHOE_SIZE 312
 
-static char SHOE[SHOE_SIZE];
+static unsigned int SHOE[SHOE_SIZE];
 
 typedef struct{
-    char hand[HAND_SIZE];
+    short hand[HAND_SIZE];
     unsigned int money;
 }player;
 
+int calculate_hand(short *hand);
 void get_move(); //read user input to perform move
 
 void hit(); //get new card
