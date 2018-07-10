@@ -20,6 +20,7 @@ typedef struct
     unsigned short hand[MAX_HAND_SIZE]; // place where cards are stored
     unsigned short amt_of_cards;// amt of cards
     unsigned int money; // amount of money in wallet
+	bool stood;
 }player;
 
 typedef struct
@@ -41,14 +42,15 @@ void add_bet(player *p,  unsigned int bet_qty); // add bet to list
 void clear_bets(); // wipe all bets from POOL
 void shuffle_shoe(); // shuffle the shoe
 void deal(player *p); // take cards from shoe at place them in the player's hand
-short calc_hand(const unsigned short *hand, const unsigned short hand_len); // get score of hand
+const short calc_hand(const unsigned short *hand, const unsigned short hand_len); // get score of hand
 void get_move(); // read user input to perform move
 void hit(player *p); // get new card
 void d_down(player *p); // double down
 void stand(player *p); // stop handing out cards to this player
 void split(player *p); // split hand
 void setup_new_game(player *p, unsigned int init_funds, player *d); // routine for new game
-bool is_over(); // check for bust
-void dump(player *p, player *d); // print current game state
+const bool is_over(); // check for bust
+void print_game_UI(); // print human_friendly game state from player's POV
+void debug_state(player *p, player *d); // print current game state
 void exec_game_loop(); //main game loop
 
