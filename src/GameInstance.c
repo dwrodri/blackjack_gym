@@ -84,7 +84,7 @@ const short calc_hand(const unsigned short *hand, const unsigned short hand_len)
     return score;
 }
 
-void hit(player *p)
+void hit(player *p, player *d)
 {
 
 }
