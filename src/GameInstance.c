@@ -46,9 +46,36 @@ void get_move()
 
 }
 
-unsigned int calc_hand(short *hand)
+short calc_hand(const unsigned short *hand, const unsigned short hand_len)
 {
-    return 0;
+    short score = 0;
+    for(unsigned short i = 0; i < hand_len; i++){
+        
+        switch (hand[i])
+        {
+            case 0: // use sign bit to track if ace is in player's hand
+                score *= -1;
+                break;
+            
+            case 10: // jack
+            case 11: // queen
+            case 12: // king
+                score += 10;
+                break;
+            default: // standard number cards (2-9)
+                score += (i+1);
+                break;
+        }
+    }
+    
+    //evaluate ace
+    if(score < -10){ //if other cards over 10, ace is 1
+        score = (score--)*-1;
+    }else if (score < 0){ // otherwise ace is 10
+        score = (-score)+11;
+    }
+
+    return score;
 }
 
 void hit(player *p)
@@ -132,7 +159,6 @@ void dump(player *p, player *d)
 
 void exec_game_loop()
 {
-    player agent, dealer;
+    player agent, dealer; // instantiate players
     setup_new_game(&agent, 100, &dealer);
-
 }
