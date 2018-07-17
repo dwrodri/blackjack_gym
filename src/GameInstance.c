@@ -2,25 +2,26 @@
 // Created by Derek Rodriguez on 5/13/18.
 //
 
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
 #include "GameInstance.h"
 
 void add_bet(player *p, unsigned int bet_qty)
 {
-    POOL[CURR_AMT_OF_BETS].bet_source = p;
+    POOL[CURR_AMT_OF_BETS].bet_src = p;
     POOL[CURR_AMT_OF_BETS].qty = bet_qty;
     CURR_AMT_OF_BETS++;
 }
 
 /*
-*   I can foresee this structure needing some change down the road.
-*   Will probably switch the bet pool to a tree structure of sorts
-*   down the line.
+*  Clear out the bet pool 
+*   
+*   
 */
 void clear_bets()
 {
+    for(unsigned short i=0; i < CURR_AMT_OF_BETS; i++){
+        POOL[i].bet_src= NULL;
+        POOL[i].qty = 0;
+    }
     CURR_AMT_OF_BETS = 0;
 }
 
@@ -84,7 +85,7 @@ const short calc_hand(const unsigned short *hand, const unsigned short hand_len)
     return score;
 }
 
-void hit(player *p, player *d)
+void hit(player *p)
 {
 
 }
@@ -143,7 +144,7 @@ const bool is_over()
 void debug_state(player *p, player *d)
 {
     puts("==========GAME STATE==========");
-    printf("Player %x:\n", (unsigned int)p);
+    printf("Player 0x%lx:\n", (uintptr_t)p);
     printf("\tHand:\t");
     for(unsigned short i = 0; i < p->amt_of_cards; i++) {
 
@@ -169,7 +170,7 @@ void debug_state(player *p, player *d)
     printf("\tBalance: %d\n", p->money);
     puts("---");
 
-    printf("Dealer: %x:\n", (unsigned int)d);
+    printf("Dealer: 0x%lx:\n", (uintptr_t)d);
     printf("\tHand:\t");
     for(unsigned short i = 0; i < d->amt_of_cards; i++) {
 
@@ -199,7 +200,7 @@ void debug_state(player *p, player *d)
 
     for(short i = 0; i < CURR_AMT_OF_BETS; i++)
     {
-        printf("\t%x\t%i\n", (unsigned int)POOL[i].bet_source, POOL[i].qty);
+        printf("\t%lx\t%i\n", (uintptr_t)POOL[i].bet_src, POOL[i].qty);
     }
     printf("---\n");
 

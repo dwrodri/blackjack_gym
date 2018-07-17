@@ -1,8 +1,11 @@
 // 
 // Created by Derek Rodriguez on 5/13/18.
 //
-
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #ifndef BLACKJACK_GYM_GAMEINSTANCE_H
 #define BLACKJACK_GYM_GAMEINSTANCE_H
@@ -33,7 +36,7 @@ typedef struct
 static unsigned short SHOE[AMT_OF_DECKS * 52]; //!< many decks
 static unsigned int TOP_OF_SHOE = 0; //!< index of top of deck
 static bet POOL[MAX_BETS]; //!< all bets placed during match go in the pool
-static unsigned short CURR_AMT_OF_BETS = 0; 
+static unsigned short CURR_AMT_OF_BETS = 0; //!< this doubles as the tracker for the POOL list 
 
 
 void add_bet(player *p,  unsigned int bet_qty); //! add bet to list
