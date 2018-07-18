@@ -142,7 +142,7 @@ const bool is_over()
 void debug_state(player_t *p, player_t *d)
 {
     puts("==========GAME STATE==========");
-    printf("Player %x:\n", (unsigned int)p);
+    printf("Player %lx:\n", (uintptr_t)p);
     printf("\tHand:\t");
     for(unsigned short i = 0; i < p->amt_of_cards; i++) {
 
@@ -167,7 +167,7 @@ void debug_state(player_t *p, player_t *d)
     printf("\tBalance: %d\n", p->money);
     puts("---");
 
-    printf("Dealer: %x:\n", (unsigned int)d);
+    printf("Dealer: %lx:\n", (uintptr_t)d);
     printf("\tHand:\t");
     for(unsigned short i = 0; i < d->amt_of_cards; i++) {
 
@@ -195,7 +195,7 @@ void debug_state(player_t *p, player_t *d)
     printf("Bet:\tplayer_t\t\tqty\n");
 
     for(short i = 0; i < CURR_AMT_OF_BETS; i++) {
-        printf("\t%x\t%i\n", (unsigned int)POOL[i].bet_src, POOL[i].qty);
+        printf("\t%lx\t%i\n", (uintptr_t)POOL[i].bet_src, POOL[i].qty);
     }
     printf("---\n");
 

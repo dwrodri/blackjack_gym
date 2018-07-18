@@ -2,6 +2,7 @@
 // Created by Derek Rodriguez on 5/13/18.
 //
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
