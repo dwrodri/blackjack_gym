@@ -52,7 +52,7 @@ char get_move()
     return userin[0];
 }
 
-const short calc_hand(const unsigned short *hand, const unsigned short hand_len)
+short calc_hand(const unsigned short *hand, const unsigned short hand_len)
 {
     short score = 0;
     for(unsigned short i = 0; i < hand_len; i++) {
@@ -90,7 +90,16 @@ void hit(player_t *p)
 
 void d_down(player_t *p)
 {
-
+    // find the bet placed at the start of the round, then double that value
+    for(unsigned short i = 0; i < CURR_AMT_OF_BETS; i++) {
+        if(POOL[i].bet_src == p) {
+            POOL[i].qty *= 2;
+            break;
+        }
+    }
+    // then deal one more card and mark player as stood
+    deal(p, 1);
+    p->stood = true;
 }
 
 void stand(player_t *p)
@@ -100,7 +109,8 @@ void stand(player_t *p)
 
 void split(player_t *p)
 {
-
+    // this is just here so I can get a clean call with -Wextra
+    printf("This feature is not yet implemented, since it will cause a lot of refactoring. Here's this player's address: %lx\n", (uintptr_t)p);
 }
 
 void setup_new_game(player_t *p, unsigned int init_funds, player_t *d)
@@ -134,7 +144,7 @@ void setup_new_game(player_t *p, unsigned int init_funds, player_t *d)
 
 }
 
-const bool is_over()
+bool end_round()
 {
     return 0;
 }
@@ -195,7 +205,7 @@ void debug_state(player_t *p, player_t *d)
     printf("Bet:\tplayer_t\t\tqty\n");
 
     for(short i = 0; i < CURR_AMT_OF_BETS; i++) {
-        printf("\t%lx\t%i\n", (uintptr_t)POOL[i].bet_src, POOL[i].qty);
+        printf("\t%lx\t\t%i\n", (uintptr_t)POOL[i].bet_src, POOL[i].qty);
     }
     printf("---\n");
 
@@ -211,7 +221,7 @@ void process_move(char code, player_t *p)
         stand(p);
         break;
     case 'd' :
-        puts("doubling down!");
+        d_down(p);
         break;
     default:
         puts("BROKEN");
@@ -228,5 +238,11 @@ void exec_game_loop()
         char move_code = get_move();
         process_move(move_code, &agent);
         debug_state(&agent, &dealer);
+
+        // auto check for broken hands at the end of the round
+        if(calc_hand(agent.hand, agent.amt_of_cards) > 21) {
+            agent.stood = true;
+        }
+
     }
 }
