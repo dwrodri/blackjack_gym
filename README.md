@@ -15,13 +15,18 @@ Once I get a soket-layer interface working, I'll start getting more serious abou
 
 ## Build Details
 
-Current Compiler
+This project uses [CMake](https://cmake.org/), because the creator is not a fan of `autotools`.
+After installing CMake on your platform, change into the repo directory and give `cmake . && make` a go.
+This should build automatically build everything for your platform, assuming you have a C11-compatible compiler.
+The binary will be in the `bin` folder. Here are the setups I have confirmed working so far:
+
 ```
-Apple LLVM version 9.1.0 (clang-902.0.39.2)
-Target: x86_64-apple-darwin17.5.0
+OS: macOS High Sierra 10.13.6 17G65 x86_64
+Kernel: 17.7.0
+CPU: Intel i7-4870HQ (8) @ 2.50GHz
+GPU: AMD Radeon R9 M370X, Intel Iris Pro
+Memory: 16384MiB
+Compiler: Apple LLVM version 9.1.0 (clang-902.0.39.2)
+Target: x86_64-apple-darwin17.7.0
 Thread model: posix
-```
-Current Compile command
-```
-clang -Wall -g -std=c11 -o bjgym src/*.c
 ```
