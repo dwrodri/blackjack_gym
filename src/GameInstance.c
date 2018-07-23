@@ -46,7 +46,6 @@ void deal(player_t *p, unsigned short amt_dealt)
 
 char get_move()
 {
-    printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
     char userin[2];
     scanf("%s", userin);
     return userin[0];
@@ -138,15 +137,75 @@ void setup_new_game(player_t *p, unsigned int init_funds, player_t *d)
     // give cards to player_t and dealer
     deal(p, 2);
     deal(d, 2);
-
-    // DEBUG: dump state
-    debug_state(p, d);
-
 }
 
 bool end_round()
 {
     return 0;
+}
+
+void print_game_ui(player_t *p, player_t *d)
+{
+    puts("==========GAME STATE==========");
+    printf("Player %lx:\n", (uintptr_t)p);
+    printf("\tHand:\t");
+    for(unsigned short i = 0; i < p->amt_of_cards; i++) {
+
+        switch (p->hand[i]) {
+        case 0: // ace
+            printf("A\t");
+            break;
+        case 10: //jack
+            printf("J\t");
+            break;
+        case 11:
+            printf("Q\t");
+            break;
+        case 12:
+            printf("K\t");
+            break;
+        default: // number card
+            printf("%i\t", p->hand[i] + 1);
+        }
+    }
+    printf("\n\tScore: %i\n", calc_hand(p->hand, p->amt_of_cards));
+    printf("\tBalance: %d\n", p->money);
+    puts("---");
+
+    printf("Dealer: %lx:\n", (uintptr_t)d);
+    printf("\tHand:\t");
+    for(unsigned short i = 0; i < d->amt_of_cards; i++) {
+
+        if(i == 0) {
+             switch (d->hand[i]) {
+                case 0: // ace
+                    printf("A\t");
+                    break;
+                case 10: //jack
+                    printf("J\t");
+                    break;
+                case 11:
+                    printf("Q\t");
+                    break;
+                case 12:
+                    printf("K\t");
+                    break;
+                default: // number card
+                    printf("%i\t", d->hand[i] + 1);
+             }
+        }else {
+            printf("X\t");
+        }
+    }
+    printf("\n");
+    printf("---\n");
+
+    printf("Bet:\tplayer_t\t\tqty\n");
+
+    for(short i = 0; i < CURR_AMT_OF_BETS; i++) {
+        printf("\t%lx\t\t%i\n", (uintptr_t)POOL[i].bet_src, POOL[i].qty);
+    }
+    printf("---\n");
 }
 
 void debug_state(player_t *p, player_t *d)
@@ -214,19 +273,67 @@ void debug_state(player_t *p, player_t *d)
 void process_move(char code, player_t *p)
 {
     switch(code) {
-    case 'h' :
-        hit(p);
-        break;
-    case 's' :
-        stand(p);
-        break;
-    case 'd' :
-        d_down(p);
-        break;
-    default:
-        puts("BROKEN");
-        break;
+        case 'h' :
+            hit(p);
+            break;
+        case 's' :
+            stand(p);
+            break;
+        case 'd' :
+            d_down(p);
+            break;
+        default:
+            puts("BROKEN");
+            break;
     }
+}
+
+void end_game_routine(player_t *p, player_t *d)
+{
+    // play out dealer, stops at 17
+    while(calc_hand(d->hand, d->amt_of_cards) < 17) {
+        hit(d);
+    }
+
+    debug_state(p, d);
+
+    // collect player scores, do payouts
+    short dealer_score = calc_hand(d->hand, d->amt_of_cards);
+    short player_score = calc_hand(p->hand, p->amt_of_cards);
+    unsigned int player_bet = 0;
+    unsigned int payout;
+    for(unsigned short i = 0; i < CURR_AMT_OF_BETS; i++) {
+            if (POOL[i].bet_src == p) {
+                player_bet = POOL[i].qty;
+                break;
+            }
+    }
+    if(player_score == 21) {
+        payout = player_score == dealer_score ? player_bet : player_bet * 2.5;
+    } else if(player_score < 21) {
+        payout = player_score < dealer_score ? 0 : player_bet * 1.5;
+    } else {
+        payout = 0;
+    }
+    
+    if(payout){
+        printf("You won %d\n", payout);
+    }
+
+    // reset POOL, ask for player confirmation 
+    clear_bets();
+    printf("End of Round. New [r]ound, new [g]ame or [q]uit?");
+    char code = get_move();
+    switch(code) {
+        case 'r':
+            puts("New Round!");
+            break;
+        case 'g':
+            exec_game_loop();
+            break;
+        default:
+            return;
+    }                   
 }
 
 void exec_game_loop()
@@ -235,9 +342,10 @@ void exec_game_loop()
     agent.stood = false;
     setup_new_game(&agent, 100, &dealer);
     while(!agent.stood){
+        print_game_ui(&agent, &dealer);
+        printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
         char move_code = get_move();
         process_move(move_code, &agent);
-        debug_state(&agent, &dealer);
 
         // auto check for broken hands at the end of the round
         if(calc_hand(agent.hand, agent.amt_of_cards) > 21) {
@@ -245,4 +353,7 @@ void exec_game_loop()
         }
 
     }
+    debug_state(&agent, &dealer);
+    puts("Rolling dealer...");
+    end_game_routine(&agent, &dealer);
 }
