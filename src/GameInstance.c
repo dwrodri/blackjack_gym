@@ -338,9 +338,12 @@ void end_game_routine(player_t *p, player_t *d)
 
 void exec_game_loop()
 {
+    // instantiate and "initialize" entities that will be used over course of the game
     player_t agent, dealer; // instantiate player_ts
     agent.stood = false;
     setup_new_game(&agent, 100, &dealer);
+
+    //this is the main loop
     while(!agent.stood){
         print_game_ui(&agent, &dealer);
         printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
@@ -353,6 +356,9 @@ void exec_game_loop()
         }
 
     }
+
+    // perform end-of-round subroutine, some of this might get moved
+    // into the loop
     debug_state(&agent, &dealer);
     puts("Rolling dealer...");
     end_game_routine(&agent, &dealer);
