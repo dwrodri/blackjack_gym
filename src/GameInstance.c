@@ -302,12 +302,12 @@ void end_round_routine(player_t *p, player_t *d)
 
     debug_state(p, d);
 
-    // collect player scores, and distribute apyouts accordingly
+    // collect player scores, and distribute payouts accordingly
     short dealer_score = calc_hand(d->hand, d->amt_of_cards);
     short player_score = calc_hand(p->hand, p->amt_of_cards);
-    printf("Player scored: %d\t Dealer scored:%d\n");
+    printf("Player scored: %d\t Dealer scored:%d\n", player_score, dealer_score);
     unsigned int player_bet = 0;
-    unsigned int payout;
+    unsigned int payout = 0;
     for(unsigned short i = 0; i < CURR_AMT_OF_BETS; i++) {
             if (POOL[i].bet_src == p) {
                 player_bet = POOL[i].qty;
@@ -315,13 +315,21 @@ void end_round_routine(player_t *p, player_t *d)
             }
     }
     if(player_score == 21) {
-        payout = player_score == dealer_score ? player_bet : player_bet * 2.5;
-    } else if(player_score < 21) {
-        payout = player_score < dealer_score ? 0 : player_bet * 1.5;
+        if(dealer_score  == 21) {
+            payout = player_bet;
+        } else {
+            payout = player_bet  * 2.5;
+        }     
+    } else if (player_score < 21) {
+        if(dealer_score <= 21) {
+            payout = player_score > dealer_score ? player_bet * 2 : 0;
+        } else {
+            payout = player_bet * 2;
+        }
     } else {
         payout = 0;
     }
-    
+
     if(payout){
         printf("You won %d\n", payout);
         p->money += payout;
@@ -344,8 +352,10 @@ void exec_game_loop()
     agent.stood = false;
     // this is the outermost loop
     while(!game_over) {
+        setup_new_game(&agent, 100, &dealer);
+        // this inner loop is for per-round logic
+        // since there's only one agent at the moment, the end-round check is simple
         while(!agent.stood){
-            setup_new_game(&agent, 100, &dealer);
             print_round_ui(&agent, &dealer);
             printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
             char move_code = get_move();
@@ -373,8 +383,11 @@ void exec_game_loop()
             case 'g':
                 game_over = true;
                 break;
+            case 'q':
+                puts("Hope you had fun playing a game for AI!");
+                return;
             default:
-                puts("What is wrong with you?");
+                puts("You're not supposed to see this.");
                 return;
         }
     }
