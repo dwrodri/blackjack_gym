@@ -8,6 +8,7 @@ a requirement for the software gym to reach alpha development stage, unless stat
 
 
 ## Design (Very important!)
+- [x] Build prototype with human controls through CLI 
 - [ ] Decide on specifics for sharing player state over the socket (medium)
 - [ ] Decide if betting and pool data needs to separate from the play data (medium) 
 - [ ] Figure out how _one_ game of 21 would be played in a synchronous manner (easy)
@@ -16,10 +17,12 @@ a requirement for the software gym to reach alpha development stage, unless stat
 ## Basic functionality (Almost as important)
 - [x] Implement single-player game logic
 - [x] add basic moves (Hit, Stand, Double Down) (easy)
+- [x] added multi-round play
 - [ ] add support for splitting a player's hand (medium)
+- [ ] add insurance option when dealer is showing jack
 - [ ] make game such that mutiple players are at the table, each move is round robin (easy)
 - [ ] Separate client and server model
-- [x] Implement a basic build system (CMake)
+- [x] Implement a basic build system (Makefile)
 - [ ] code up sample client(s) that can send plays to server 
 
 ## Code Quality things to make my code acceptable to other humans
