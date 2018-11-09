@@ -1,10 +1,17 @@
-//
+///
 // Created by Derek Rodriguez on 5/13/18.
 //
 
 #include "GameInstance.h"
 
-void add_bet(player_t *p, unsigned int bet_qty)
+void clear_hand(player_t *p) {
+    for(unsigned short i = 0; i < MAX_HAND_SIZE; i++) {
+        p->hand[i] = 0;
+    }
+    p-> amt_of_cards = 0;
+}
+
+void add_bet_t(player_t *p, unsigned int bet_qty)
 {
     POOL[CURR_AMT_OF_BETS].bet_src = p;
     POOL[CURR_AMT_OF_BETS].qty = bet_qty;
@@ -24,7 +31,7 @@ void clear_bets()
 void shuffle_shoe()
 {
     for (unsigned int i = (AMT_OF_DECKS*52)-1; i > 0; i--) {
-        // TODO: make this more random
+        // TODO: Replace this with something more random than just rand()
         srand(time(NULL));
         // Pick a random index from 0 to i
         unsigned int j = rand() % (i+1);
@@ -44,18 +51,10 @@ void deal(player_t *p, unsigned short amt_dealt)
     p->amt_of_cards += amt_dealt; 
 }
 
-char get_move()
-{
-    char userin[2];
-    scanf("%s", userin);
-    return userin[0];
-}
-
 short calc_hand(const unsigned short *hand, const unsigned short hand_len)
 {
     short score = 0;
     for(unsigned short i = 0; i < hand_len; i++) {
-
         switch (hand[i]) {
         case 0: // use sign bit to track if ace is in player_t's hand
             score *= -1;
@@ -71,7 +70,6 @@ short calc_hand(const unsigned short *hand, const unsigned short hand_len)
             break;
         }
     }
-
     //evaluate ace
     if(score < -10) { //if other cards over 10, ace is 1
         score = (score-1)*-1;
@@ -80,6 +78,13 @@ short calc_hand(const unsigned short *hand, const unsigned short hand_len)
     }
 
     return score;
+}
+
+char get_move()
+{
+    char userin[2];
+    scanf("%s", userin);
+    return userin[0];
 }
 
 void hit(player_t *p)
@@ -114,10 +119,15 @@ void split(player_t *p)
 
 void setup_new_game(player_t *p, unsigned int init_funds, player_t *d)
 {
+    // if not a new game, then don't use init_funds
+    if (p->money != USHRT_MAX) {
+        init_funds = p->money;
+    }
+
     // clean up player_ts
-    p->amt_of_cards = 0;
-    d->amt_of_cards = 0;
-    char* prompt = "Welcome to BJGym. You will be starting this round with %i credits.";
+    clear_hand(p);
+    clear_hand(d);
+    char* prompt = "Welcome to BJGym. You will be starting with %i credits.\n";
     printf(prompt, init_funds);
 
     // generate shoe
@@ -132,19 +142,14 @@ void setup_new_game(player_t *p, unsigned int init_funds, player_t *d)
     printf("How much would you like to bet?: ");
     scanf("%i", &strt_bet_qty);
     p->money -= strt_bet_qty;
-    add_bet(p, strt_bet_qty);
+    add_bet_t(p, strt_bet_qty);
 
     // give cards to player_t and dealer
     deal(p, 2);
     deal(d, 2);
 }
 
-bool end_round()
-{
-    return 0;
-}
-
-void print_game_ui(player_t *p, player_t *d)
+void print_round_ui(player_t *p, player_t *d)
 {
     puts("==========GAME STATE==========");
     printf("Player %lx:\n", (uintptr_t)p);
@@ -288,7 +293,7 @@ void process_move(char code, player_t *p)
     }
 }
 
-void end_game_routine(player_t *p, player_t *d)
+void end_round_routine(player_t *p, player_t *d)
 {
     // play out dealer, stops at 17
     while(calc_hand(d->hand, d->amt_of_cards) < 17) {
@@ -297,9 +302,10 @@ void end_game_routine(player_t *p, player_t *d)
 
     debug_state(p, d);
 
-    // collect player scores, do payouts
+    // collect player scores, and distribute apyouts accordingly
     short dealer_score = calc_hand(d->hand, d->amt_of_cards);
     short player_score = calc_hand(p->hand, p->amt_of_cards);
+    printf("Player scored: %d\t Dealer scored:%d\n");
     unsigned int player_bet = 0;
     unsigned int payout;
     for(unsigned short i = 0; i < CURR_AMT_OF_BETS; i++) {
@@ -318,48 +324,58 @@ void end_game_routine(player_t *p, player_t *d)
     
     if(payout){
         printf("You won %d\n", payout);
+        p->money += payout;
     }
 
-    // reset POOL, ask for player confirmation 
+    // reset POOL, player, and dealer
     clear_bets();
-    printf("End of Round. New [r]ound, new [g]ame or [q]uit?");
-    char code = get_move();
-    switch(code) {
-        case 'r':
-            puts("New Round!");
-            break;
-        case 'g':
-            exec_game_loop();
-            break;
-        default:
-            return;
-    }                   
+                               
 }
 
 void exec_game_loop()
 {
     // instantiate and "initialize" entities that will be used over course of the game
     player_t agent, dealer; // instantiate player_ts
+    bool game_over = false;
+
+    // set some default values for the agent
+    // this will make it easier to recycle some code for new rounds
+    agent.money = USHRT_MAX;
     agent.stood = false;
-    setup_new_game(&agent, 100, &dealer);
+    // this is the outermost loop
+    while(!game_over) {
+        while(!agent.stood){
+            setup_new_game(&agent, 100, &dealer);
+            print_round_ui(&agent, &dealer);
+            printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
+            char move_code = get_move();
+            process_move(move_code, &agent);
 
-    //this is the main loop
-    while(!agent.stood){
-        print_game_ui(&agent, &dealer);
-        printf("What would you like to do?[h]it/[s]tand/[d]ouble: ");
-        char move_code = get_move();
-        process_move(move_code, &agent);
-
-        // auto check for broken hands at the end of the round
-        if(calc_hand(agent.hand, agent.amt_of_cards) > 21) {
-            agent.stood = true;
+            // auto check for broken hands at the end of the round
+            if(calc_hand(agent.hand, agent.amt_of_cards) > 21) {
+                agent.stood = true;
+            }
+            
         }
 
+        // perform end-of-round subroutine, some of this might get moved
+        // into the loop
+        debug_state(&agent, &dealer);
+        puts("Rolling dealer...");
+        end_round_routine(&agent, &dealer);
+        printf("End of Round. New [r]ound, new [g]ame or [q]uit?");
+        char code = get_move();
+        switch(code) {
+            case 'r':
+                puts("New Round!");
+                agent.stood=false;
+                break;
+            case 'g':
+                game_over = true;
+                break;
+            default:
+                puts("What is wrong with you?");
+                return;
+        }
     }
-
-    // perform end-of-round subroutine, some of this might get moved
-    // into the loop
-    debug_state(&agent, &dealer);
-    puts("Rolling dealer...");
-    end_game_routine(&agent, &dealer);
 }

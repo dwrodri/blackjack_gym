@@ -5,8 +5,8 @@
 CC = clang
 TARGET = blackjack
 SRC = src/*.c
-CFLAGS = -O2 
-DEBUG_CFLAGS = -g -O0
+CFLAGS = -O2 -Wall -Wextra
+DEBUG_CFLAGS = -g -O0 -Wall -Wextra
 
 all:
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)

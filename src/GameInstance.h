@@ -7,6 +7,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #ifndef BLACKJACK_GYM_GAMEINSTANCE_H
 #define BLACKJACK_GYM_GAMEINSTANCE_H
@@ -23,7 +24,7 @@ typedef struct
     unsigned short hand[MAX_HAND_SIZE]; // place where cards are stored
     unsigned short amt_of_cards;// amt of cards
     unsigned int money; // amount of money in wallet
-	bool stood;
+	 bool stood;
 }player_t; //!< the datatype for storing player_t state
 
 typedef struct
@@ -38,7 +39,7 @@ static unsigned int TOP_OF_SHOE = 0; //!< index of top of deck
 static bet_t POOL[MAX_BETS]; //!< all bet_ts placed during match go in the pool
 static unsigned short CURR_AMT_OF_BETS = 0; //!< tracks amount of usage in the pool
 
-
+void clear_hand(player_t *p); //! reset the hand of a player
 void add_bet_t(player_t *p,  unsigned int bet_qty); //! add bet to list
 void clear_bets(); //! wipe all bets from POOL
 void shuffle_shoe(); //! shuffle the shoe
@@ -50,9 +51,8 @@ void d_down(player_t *p); //! double down
 void stand(player_t *p); //! stop handing out cards to this player_t
 void split(player_t *p); //! split hand
 void setup_new_game(player_t *p, unsigned int init_funds, player_t *d); //! routine for new game
-bool end_round(); //! perform dealer subroutine after all players have stood
-void print_game_ui(); //! print human_friendly game state from player_t's POV
+void print_round_ui(); //! print human_friendly game state from player_t's POV
 void debug_state(player_t *p, player_t *d); //! print current game state
 void process_move(char code, player_t *p); //! perform action for player_t based on code
-void end_game_routine(player_t *p, player_t *d); //! let dealer "play out", distribute payouts
+void end_round_routine(player_t *p, player_t *d); //! let dealer "play out", distribute payouts
 void exec_game_loop(); //! main game loop
