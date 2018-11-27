@@ -14,6 +14,13 @@
 
 #endif 
 
+// card constant macros
+#define ACE 0
+#define JACK 10
+#define QUEEN 11
+#define KING 12
+
+// game parameter macros
 #define MAX_HAND_SIZE 8
 #define AMT_OF_DECKS 6
 #define MAX_BETS 4
@@ -21,7 +28,7 @@
 
 typedef struct
 {
-    unsigned short hand[MAX_HAND_SIZE]; // place where cards are stored
+    short hand[MAX_HAND_SIZE]; // place where cards are stored
     unsigned short amt_of_cards;// amt of cards
     unsigned int money; // amount of money in wallet
 	 bool stood;
@@ -34,7 +41,7 @@ typedef struct
 } bet_t; //!< used as a log entry in the bet ledger.
 
 
-static unsigned short SHOE[AMT_OF_DECKS * 52]; //!< many decks
+static short SHOE[AMT_OF_DECKS * 52]; //!< many decks
 static unsigned int TOP_OF_SHOE = 0; //!< index of top of deck
 static bet_t POOL[MAX_BETS]; //!< all bet_ts placed during match go in the pool
 static unsigned short CURR_AMT_OF_BETS = 0; //!< tracks amount of usage in the pool
@@ -44,7 +51,7 @@ void add_bet_t(player_t *p,  unsigned int bet_qty); //! add bet to list
 void clear_bets(); //! wipe all bets from POOL
 void shuffle_shoe(); //! shuffle the shoe
 void deal(player_t *p, unsigned short amt_dealt); //! take cards from shoe at place them in the player_t's hand
-short calc_hand(const unsigned short *hand, const unsigned short hand_len); //! get score of hand
+short calc_hand(const short *hand, const unsigned short hand_len); //! get score of hand
 char get_move(); //! read user input to perform move
 void hit(player_t *p); //! get new card
 void d_down(player_t *p); //! double down

@@ -32,7 +32,8 @@ void shuffle_shoe()
 {
     for (unsigned int i = (AMT_OF_DECKS*52)-1; i > 0; i--) {
         // TODO: Replace this with something more random than just rand()
-        srand(time(NULL));
+        // Also, this is set to zero for now for determinism
+        srand(2018);
         // Pick a random index from 0 to i
         unsigned int j = rand() % (i+1);
 
@@ -51,18 +52,18 @@ void deal(player_t *p, unsigned short amt_dealt)
     p->amt_of_cards += amt_dealt; 
 }
 
-short calc_hand(const unsigned short *hand, const unsigned short hand_len)
+short calc_hand(const short *hand, const unsigned short hand_len)
 {
     short score = 0;
     for(unsigned short i = 0; i < hand_len; i++) {
         switch (hand[i]) {
-        case 0: // use sign bit to track if ace is in player_t's hand
+        case ACE: // use sign bit to track if ace is in player_t's hand
             score *= -1;
             break;
 
-        case 10: // jack
-        case 11: // queen
-        case 12: // king
+        case JACK: // jack
+        case QUEEN: // queen
+        case KING: // king
             score += 10;
             break;
         default: // standard number cards (2-9)
@@ -157,16 +158,16 @@ void print_round_ui(player_t *p, player_t *d)
     for(unsigned short i = 0; i < p->amt_of_cards; i++) {
 
         switch (p->hand[i]) {
-        case 0: // ace
+        case ACE:
             printf("A\t");
             break;
-        case 10: //jack
+        case JACK: //jack
             printf("J\t");
             break;
-        case 11:
+        case QUEEN:
             printf("Q\t");
             break;
-        case 12:
+        case KING:
             printf("K\t");
             break;
         default: // number card
@@ -183,19 +184,19 @@ void print_round_ui(player_t *p, player_t *d)
 
         if(i == 0) {
              switch (d->hand[i]) {
-                case 0: // ace
+                case ACE:
                     printf("A\t");
                     break;
-                case 10: //jack
+                case JACK:
                     printf("J\t");
                     break;
-                case 11:
+                case QUEEN:
                     printf("Q\t");
                     break;
-                case 12:
+                case KING:
                     printf("K\t");
                     break;
-                default: // number card
+                default: // number cards are values from 1-9, add 1 to be 2-10 
                     printf("%i\t", d->hand[i] + 1);
              }
         }else {
@@ -221,16 +222,16 @@ void debug_state(player_t *p, player_t *d)
     for(unsigned short i = 0; i < p->amt_of_cards; i++) {
 
         switch (p->hand[i]) {
-        case 0: // ace
+        case ACE:
             printf("A\t");
             break;
-        case 10: //jack
+        case JACK:
             printf("J\t");
             break;
-        case 11:
+        case QUEEN:
             printf("Q\t");
             break;
-        case 12:
+        case KING:
             printf("K\t");
             break;
         default: // number card
@@ -246,16 +247,16 @@ void debug_state(player_t *p, player_t *d)
     for(unsigned short i = 0; i < d->amt_of_cards; i++) {
 
         switch (d->hand[i]) {
-        case 0: // ace
+        case ACE:
             printf("A\t");
             break;
-        case 10: //jack
+        case JACK:
             printf("J\t");
             break;
-        case 11:
+        case QUEEN:
             printf("Q\t");
             break;
-        case 12:
+        case KING:
             printf("K\t");
             break;
         default: // number card

@@ -1,6 +1,9 @@
+# IDE folders
 .idea/
 .vscode/
-bin/*
+
+# ignore the binary
+blackack
 
 # Prerequisites
 *.d
