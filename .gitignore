@@ -2,6 +2,9 @@
 .idea/
 .vscode/
 
+# Ignore stupid macOS dbeug symbols
+*.dSYM/
+
 # ignore the binary
 blackack
 
